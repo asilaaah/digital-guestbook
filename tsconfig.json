@@ -6,7 +6,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["naive-ui/volar"]
+    "types": ["naive-ui/volar", "pinia-plugin-persist"],
+    "ignoreDeprecations": "5.0"
   },
 
   "references": [
