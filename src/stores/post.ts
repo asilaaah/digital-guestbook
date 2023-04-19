@@ -1,5 +1,9 @@
 import type { Post } from "@/types/post";
 import { defineStore } from "pinia";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import db from "@/firebase/init";
+
+const colRefPosts = collection(db, "posts");
 
 export const usePostStore = defineStore({
     id: "postState",
@@ -10,21 +14,19 @@ export const usePostStore = defineStore({
         getPosts: (state) => state.posts
     },
     actions: {
-        addPost(poster_name: string, message: string, photo?: string, poster_avatar?: string) {
+        async addPost(poster_name: string, message: string, photo?: string, poster_avatar?: string) {
             const post: Post = {
-                id: Math.floor(Math.random() * 10000),
                 poster: {
                     name: poster_name,
-                    avatar: poster_avatar
+                    avatar: poster_avatar ?? ''
                 },
                 message,
-                photo
+                photo: photo ?? '',
+                create: serverTimestamp()
             }
             this.posts = [post, ...this.posts];
-        },
-        deletePost(id: number) {
-            this.posts = this.posts.filter((post) => post.id !== id)
-        } 
+            await addDoc(colRefPosts, post);
+        }
     },
     persist: {
         enabled: true

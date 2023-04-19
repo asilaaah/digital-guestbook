@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { Add } from '@vicons/carbon';
-import { usePostStore } from '@/stores/post';
 import { useUserStore } from '@/stores/user';
 import router from '@/router';
 import { Logout } from '@vicons/carbon';
+import { useCollection } from 'vuefire'
+import { collection } from '@firebase/firestore';
+import db from '@/firebase/init';
+import type { Post } from '@/types/post';
 
-const storePost = usePostStore();
 const storeUser = useUserStore();
+
+const allPosts = useCollection<Post>(collection(db, 'posts'));
 
 const redirectFormPage = () => {
     router.push({name: 'form'})
@@ -30,7 +34,7 @@ const logout = () => {
     <NSpace align="center" vertical class="create-button">
         <NH1 class="title-text">
             <NText type="primary" :italic="true">
-                IZATI & IZZAT
+                Digital Guestbook
             </NText>
         </NH1>
         <NH3 class="title-text">
@@ -41,7 +45,7 @@ const logout = () => {
     </NSpace>
     
     <NGrid x-gap="12" y-gap="12" cols="1" class="create-button">
-        <NGridItem v-for="post in storePost.posts" :key="post.photo">
+        <NGridItem v-for="post in allPosts.sort((a, b) => b.create - a.create)" :key="post.photo">
             <NCard>
                 {{ post.message }}
                 <template #footer>
@@ -56,9 +60,14 @@ const logout = () => {
                             <NText>
                                 {{ post.poster.name }}
                             </NText>
-                        </NSpace>
+                        </NSpace> 
                         <NText>
-                            21 Mar 03:04
+                            {{ post.create.toDate().toLocaleTimeString([], {
+                                month: "long",
+                                day: "numeric",
+                                hour: "2-digit", 
+                                minute: "2-digit"
+                              }) }}
                         </NText>
                     </NSpace>
                 </template>
@@ -66,7 +75,7 @@ const logout = () => {
         </NGridItem>
     </NGrid>
 
-    <NEmpty description="No post yet." v-if="storePost.posts.length < 1">
+    <NEmpty description="No post yet." v-if="allPosts.length < 1">
         <template #extra>
             <NButton @click="redirectFormPage" type="primary" secondary size="small">
                 Say congratulations now. 
