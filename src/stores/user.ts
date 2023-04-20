@@ -1,7 +1,7 @@
 import type { UserDetail } from "@/types/user";
 import { defineStore } from "pinia";
 import { collection, addDoc } from "firebase/firestore"
-import db from '@/firebase/init'
+import { db } from '@/firebase/init'
 
 const colRefUsers = collection(db, "users");
 

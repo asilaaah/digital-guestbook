@@ -5,18 +5,16 @@ import { useUserStore } from '@/stores/user';
 import { ref } from 'vue';
 import type { FormInst, FormRules } from 'naive-ui';
 import { useMessage } from 'naive-ui';
+import { storage } from '@/firebase/init'
+import { ref as FirebaseStorageRef, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 const storePost = usePostStore();
 const storeUser = useUserStore();
-const message = useMessage()
-
-const formRef = ref<FormInst | null>(null)
 
 const postForm = ref({
     message: '',
-    photo: ''
+    photo: []
 })
-
 const rules: FormRules = {
     message: {
         required: true,
@@ -24,23 +22,47 @@ const rules: FormRules = {
         trigger: ['input', 'blur']
     },
 }
-
-const handleBack = () => {
-    router.push({name: 'gallery'})
-}
-
-function savePost (e: MouseEvent) {
+const message = useMessage()
+const formRef = ref<FormInst | null>(null)
+const savePost = (e: MouseEvent) => {
     e.preventDefault()
     formRef.value?.validate((errors) => {
         if (!errors) {
-            storePost.addPost(storeUser.getUserDetail.name, postForm.value.message)
-            router.push({name: 'gallery'})
+            storePost.addPost(storeUser.getUserDetail.name, postForm.value.message, photoUrl.value)
+            setTimeout(() => router.push({name: 'gallery'}), 1000)
         } else {
             message.error('Please enter message field.', {closable: true})
         }
     })
 }
 
+const handleBack = () => {
+    router.push({name: 'gallery'})
+}
+
+const photoUrl = ref('');
+const onUpload = () => {
+    const file = postForm.value.photo[0]
+    const storageRef = FirebaseStorageRef(storage, `${file['name']}`)
+    const metadata = {
+        contentType: `${file['type']}`,
+    };
+    const uploadTask = uploadBytesResumable(storageRef, file['file'], metadata)
+    uploadTask.on("state_changed",
+        (snapshot) => {
+            const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+            console.log(progress)
+        },
+        (error) => {
+            message.error(`${error}`)
+        },
+        () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                photoUrl.value = downloadURL
+            })
+        }
+    )
+}
 </script>
 
 <template>
@@ -55,13 +77,9 @@ function savePost (e: MouseEvent) {
     >
         <NFormItem label="Add Photo">
             <NUpload
-                action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
-                :headers="{
-                    'naive-info': 'hello!'
-                }"
-                :data="{
-                    'naive-data': 'cool! naive!'
-                }"
+                v-model:file-list="postForm.photo"
+                :show-file-list="true"
+                :custom-request="onUpload"
                 >
                 <NButton type="primary">Upload File</NButton>
             </NUpload>

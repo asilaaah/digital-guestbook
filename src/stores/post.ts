@@ -1,7 +1,7 @@
 import type { Post } from "@/types/post";
 import { defineStore } from "pinia";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import db from "@/firebase/init";
+import { db } from "@/firebase/init";
 
 const colRefPosts = collection(db, "posts");
 
