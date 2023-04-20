@@ -2,20 +2,48 @@
 import router from '@/router';
 import { ref } from 'vue'
 import { useUserStore } from "../stores/user";
-const storeUser = useUserStore();
-
-const formValue = ref({ 
-    name: storeUser.getUserDetail.name,
-    avatar: storeUser.getUserDetail.avatar
-})
+import { storage } from '@/firebase/init';
+import { ref as FirebaseStorageRef, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { useMessage } from 'naive-ui';
 
 const handleBack = () => {
     router.push({name: 'gallery'})
 }
 
+const storeUser = useUserStore();
+const formValue = ref({ 
+    name: '',
+    avatar: []
+})
+
 const submitForm = () => {
-    storeUser.saveUser(formValue.value.name, formValue.value.avatar);
-    router.push({name: 'form'})
+    storeUser.saveUser(formValue.value.name, avatarUrl.value);
+    setTimeout(() => router.push({name: 'form'}), 1000)
+}
+
+const message = useMessage()
+const avatarUrl = ref('');
+const uploadAvatar = () => {
+    const file = formValue.value.avatar[0]
+    const storageRef = FirebaseStorageRef(storage, `avatar/${file['name']}`)
+    const metadata = {
+        contentType: `${file['type']}`,
+    };
+    const uploadTask = uploadBytesResumable(storageRef, file['file'], metadata)
+    uploadTask.on("state_changed",
+        (snapshot) => {
+            const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+            console.log(progress)
+        },
+        (error) => {
+            message.error(`${error}`)
+        },
+        () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                avatarUrl.value = downloadURL
+            })
+        }
+    )
 }
 </script>
 
@@ -36,13 +64,10 @@ const submitForm = () => {
         </NFormItem>
         <NFormItem label="Your avatar (Optional)">
             <NUpload
-                :headers="{
-                    'naive-info': 'hello!'
-                }"
-                :data="{
-                    'naive-data': 'cool! naive!'
-                }"
-                >
+                v-model:file-list="formValue.avatar"
+                :show-file-list="true"
+                :custom-request="uploadAvatar"
+            >
                 <NButton v-model:value="formValue.avatar" type="primary">Upload File</NButton>
             </NUpload>
         </NFormItem>

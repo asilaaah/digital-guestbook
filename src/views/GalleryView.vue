@@ -5,7 +5,7 @@ import router from '@/router';
 import { Logout } from '@vicons/carbon';
 import { useCollection } from 'vuefire'
 import { collection } from '@firebase/firestore';
-import db from '@/firebase/init';
+import { db } from '@/firebase/init';
 import type { Post } from '@/types/post';
 
 const storeUser = useUserStore();
@@ -34,7 +34,7 @@ const logout = () => {
     <NSpace align="center" vertical class="create-button">
         <NH1 class="title-text">
             <NText type="primary" :italic="true">
-                Digital Guestbook
+                Guestbook
             </NText>
         </NH1>
         <NH3 class="title-text">
@@ -45,9 +45,21 @@ const logout = () => {
     </NSpace>
     
     <NGrid x-gap="12" y-gap="12" cols="1" class="create-button">
-        <NGridItem v-for="post in allPosts.sort((a, b) => b.create - a.create)" :key="post.photo">
+        <NGridItem v-for="post in allPosts.sort((a, b) => b.create - a.create)" :key="post.create">
             <NCard>
-                {{ post.message }}
+                <NGrid x-gap="12" :cols="post.photo ? 2 : 1">
+                    <NGi>
+                      <div>{{ post.message }}</div>
+                    </NGi>
+                    <NGi>
+                      <div class="post-photo">
+                        <NImage
+                            width="100"
+                            :src="post.photo"
+                        />
+                        </div>
+                    </NGi>
+                </NGrid>
                 <template #footer>
                     <NSpace justify="space-between">
                         <NSpace>
@@ -55,19 +67,19 @@ const logout = () => {
                                 v-if="post.poster.avatar"
                                 round
                                 size="small"
-                                src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+                                :src="post.poster.avatar"
                             />
-                            <NText>
+                            <NText class="post-details">
                                 {{ post.poster.name }}
                             </NText>
                         </NSpace> 
-                        <NText>
+                        <NText class="post-details">
                             {{ post.create.toDate().toLocaleTimeString([], {
                                 month: "long",
                                 day: "numeric",
                                 hour: "2-digit", 
-                                minute: "2-digit"
-                              }) }}
+                                minute: "2-digit"}) 
+                            }}
                         </NText>
                     </NSpace>
                 </template>
@@ -103,5 +115,13 @@ const logout = () => {
     bottom: 15px;
     position: fixed;
     right: 15px;
+}
+
+.post-photo {
+    float: right;
+}
+
+.post-details {
+    font-size: smaller;
 }
 </style>

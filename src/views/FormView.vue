@@ -28,7 +28,7 @@ const savePost = (e: MouseEvent) => {
     e.preventDefault()
     formRef.value?.validate((errors) => {
         if (!errors) {
-            storePost.addPost(storeUser.getUserDetail.name, postForm.value.message, photoUrl.value)
+            storePost.addPost(storeUser.getUserDetail.name, postForm.value.message, photoUrl.value, storeUser.getUserDetail.avatar)
             setTimeout(() => router.push({name: 'gallery'}), 1000)
         } else {
             message.error('Please enter message field.', {closable: true})
@@ -80,7 +80,7 @@ const onUpload = () => {
                 v-model:file-list="postForm.photo"
                 :show-file-list="true"
                 :custom-request="onUpload"
-                >
+            >
                 <NButton type="primary">Upload File</NButton>
             </NUpload>
         </NFormItem>
