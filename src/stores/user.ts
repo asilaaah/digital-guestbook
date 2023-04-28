@@ -19,7 +19,7 @@ export const useUserStore = defineStore({
             const user: UserDetail = {
                 token: (Math.random() + 1).toString(36).substring(7),
                 name,
-                avatar: avatar ?? ''
+                avatar: avatar
             };
             this.user = user;
             await addDoc(colRefUsers, this.user)

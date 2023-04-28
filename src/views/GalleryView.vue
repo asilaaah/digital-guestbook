@@ -57,7 +57,7 @@ const generateRandomNumber = () => {
                         <NGi>
                             <div>{{ post.message }}</div>
                         </NGi>
-                        <NGi>
+                        <NGi v-if="post.photo">
                             <div class="post-photo-right">
                                 <NImage
                                     width="100"
@@ -70,7 +70,7 @@ const generateRandomNumber = () => {
 
                     <div v-else>
                         <NGrid x-gap="12" :cols="post.photo ? 2 : 1">
-                        <NGi>
+                        <NGi v-if="post.photo">
                             <div class="post-photo-left">
                               <NImage
                                   width="100"
