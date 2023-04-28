@@ -19,6 +19,11 @@ const redirectFormPage = () => {
 const logout = () => {
     storeUser.removeUser();
 }
+
+const generateRandomNumber = () => {
+    let x = Math.floor((Math.random() * 2) + 1);
+    return x
+}
 </script>
 
 <template>
@@ -47,19 +52,37 @@ const logout = () => {
     <NGrid x-gap="12" y-gap="12" cols="1" class="create-button">
         <NGridItem v-for="post in allPosts.sort((a, b) => b.create - a.create)" :key="post.create">
             <NCard>
+                <div v-if="generateRandomNumber() === 1">
                 <NGrid x-gap="12" :cols="post.photo ? 2 : 1">
-                    <NGi>
-                      <div>{{ post.message }}</div>
-                    </NGi>
-                    <NGi>
-                      <div class="post-photo">
-                        <NImage
-                            width="100"
-                            :src="post.photo"
-                        />
-                        </div>
-                    </NGi>
-                </NGrid>
+                        <NGi>
+                            <div>{{ post.message }}</div>
+                        </NGi>
+                        <NGi>
+                            <div class="post-photo-right">
+                                <NImage
+                                    width="100"
+                                    :src="post.photo"
+                                />
+                            </div>
+                        </NGi>
+                        </NGrid>
+                    </div>
+
+                    <div v-else>
+                        <NGrid x-gap="12" :cols="post.photo ? 2 : 1">
+                        <NGi>
+                            <div class="post-photo-left">
+                              <NImage
+                                  width="100"
+                                  :src="post.photo"
+                              />
+                            </div>
+                        </NGi>
+                        <NGi>
+                            <div>{{ post.message }}</div>
+                        </NGi>
+                        </NGrid>
+                    </div>
                 <template #footer>
                     <NSpace justify="space-between">
                         <NSpace>
@@ -117,8 +140,12 @@ const logout = () => {
     right: 15px;
 }
 
-.post-photo {
+.post-photo-right {
     float: right;
+}
+
+.post-photo-left {
+    float: left;
 }
 
 .post-details {
