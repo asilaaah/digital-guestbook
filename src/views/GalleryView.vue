@@ -53,36 +53,37 @@ const generateRandomNumber = () => {
         <NGridItem v-for="post in allPosts.sort((a, b) => b.create - a.create)" :key="post.create">
             <NCard>
                 <div v-if="generateRandomNumber() === 1">
-                <NGrid x-gap="12" :cols="post.photo ? 2 : 1">
+                    <NGrid x-gap="12" :cols="post.photo ? 2 : 1">
                         <NGi>
-                            <div>{{ post.message }}</div>
+                            <div :class="post.photo ? 'post-left' : ''">{{ post.message }}</div>
                         </NGi>
                         <NGi v-if="post.photo">
-                            <div class="post-photo-right">
+                            <div class="post-right">
                                 <NImage
                                     width="100"
                                     :src="post.photo"
                                 />
                             </div>
                         </NGi>
-                        </NGrid>
-                    </div>
+                    </NGrid>
+                </div>
 
-                    <div v-else>
-                        <NGrid x-gap="12" :cols="post.photo ? 2 : 1">
+                <div v-else>
+                    <NGrid x-gap="12" :cols="post.photo ? 2 : 1">
                         <NGi v-if="post.photo">
-                            <div class="post-photo-left">
-                              <NImage
-                                  width="100"
-                                  :src="post.photo"
-                              />
+                            <div class="post-left">
+                                <NImage
+                                    width="100"
+                                    :src="post.photo"
+                                />
                             </div>
                         </NGi>
                         <NGi>
-                            <div>{{ post.message }}</div>
+                            <div :class="post.photo ? 'post-right' : ''">{{ post.message }}</div>
                         </NGi>
-                        </NGrid>
-                    </div>
+                    </NGrid>
+                </div>
+
                 <template #footer>
                     <NSpace justify="space-between">
                         <NSpace>
@@ -140,11 +141,11 @@ const generateRandomNumber = () => {
     right: 15px;
 }
 
-.post-photo-right {
+.post-right {
     float: right;
 }
 
-.post-photo-left {
+.post-left {
     float: left;
 }
 
